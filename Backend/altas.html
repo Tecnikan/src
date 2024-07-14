@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agregar producto</title>
+  <link rel="stylesheet" href="./static/css/estilos.css" />
+
+  <!--Script que toma la fecha del sistema y la coloca en el campo correspondiente-->
+  <script>
+    function setCurrentDate() {
+      var dateField = document.getElementById("fecha");
+      var currentDate = new Date();
+      var day = ("0" + currentDate.getDate()).slice(-2);
+      var month = ("0" + (currentDate.getMonth() + 1)).slice(-2);
+      var year = currentDate.getFullYear();
+      var dateString = year + "-" + month + "-" + day;
+      dateField.value = dateString;
+    }
+    window.onload = setCurrentDate;
+  </script>
+</head>
+
+<body>
+  <div class="logo-centrado">
+    <!--<img src="./static/imagenes/Computer.jpg" width="600" height="300" alt="logo">-->
+  </div>
+  <h1>Crear Ticket de Cliente</h1><br />
+
+  <!--enctype="multipart/form-data" es necesario para enviar archivos al back.-->
+  <form id="formulario" enctype="multipart/form-data">
+    <!-- enctype="multipart/form-data" es necesario para enviar archivos al back. Se usa este para enviar datos y archivos -->
+
+    <label for="cliente">Cliente:</label>
+    <input type="text" id="cliente" name="cliente" required /><br />
+
+    <label for="tecnico">Tecnico Asignado:</label>
+    <input type="text" id="tecnico" name="tecnico" required /><br />
+
+    <label for="fecha">Fecha:</label>
+    <input type="text" id="fecha" name="fecha" required value="dateString" readonly /><br />
+
+    <label for="descripcion">Descripcion:</label>
+    <input type="text" id="descripcion" name="descripcion" required /><br />
+
+    <label for="estado">Estado:</label>
+    <input type="text" id="estado" name="estado" required /><br />
+
+    <label for="observaciones">Observaciones:</label>
+    <input type="text" id="observaciones" name="observaciones" required /><br />
+
+    <button type="submit">Guardar Ticket</button>
+    <a href="index.html">Menu principal</a>
+  </form>
+
+  <script>
+    // const URL = "http://127.0.0.1:5000/";
+
+    //Al subir al servidor, deberá utilizarse la siguiente ruta. USUARIO debe ser reemplazado por el nombre de usuario de Pythonanywhere
+    const URL = "https://nestor380.pythonanywhere.com/"
+
+    // Capturamos el evento de envío del formulario
+    document
+      .getElementById("formulario")
+      .addEventListener("submit", function (event) {
+        event.preventDefault(); // Evitamos que se envie el form
+
+        var formData = new FormData(this);
+
+        // Realizamos la solicitud POST al servidor
+        fetch(URL + "tickets", {
+          // fetcheamos a la URL http://http://127.0.0.1:5000/productos con el método POST (usamos la variable URL definida antes para poder colocar despues solo el nombre del decorador de la ruta en el servidor, en este caso productos)
+          method: "POST",
+          body: formData, // Aquí enviamos formData. Dado que formData puede contener archivos, no se utiliza JSON.
+        })
+          //Después de realizar la solicitud POST, se utiliza el método then() para manejar la respuesta del servidor.
+          .then(function (response) {
+            if (response.ok) {
+              //Si la respuesta es exitosa, convierte los datos de la respuesta a formato JSON.
+              return response.json();
+            } else {
+              // Si hubo un error, lanzar explícitamente una excepción
+              // para ser "catcheada" más adelante
+              throw new Error("Error al agregar el ticket.");
+            }
+          })
+
+          //Respuesta OK, muestra una alerta informando que el producto se agregó correctamente y limpia los campos del formulario para que puedan ser utilizados para un nuevo producto.
+          .then(function (data) {
+            alert("Ticket agregado correctamente.");
+          })
+
+          // En caso de error, mostramos una alerta con un mensaje de error.
+          .catch(function (error) {
+            alert("Error al agregar el Ticket.");
+          })
+
+          // Limpiar el formulario en ambos casos (éxito o error)
+          .finally(function () {
+            document.getElementById("cliente").value = "";
+            document.getElementById("tecnico").value = "";
+            document.getElementById("fecha").value = "";
+            document.getElementById("descripcion").value = "";
+            document.getElementById("estado").value = "";
+            document.getElementById("observaciones").value = "";
+          });
+      });
+  </script>
+</body>
+
+</html>
